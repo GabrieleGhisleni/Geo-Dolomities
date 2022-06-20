@@ -1,0 +1,365 @@
+---
+title: "Alpine huts price analysis"
+author: "Gabriele"
+output: pdf_document
+---
+
+# Alpine huts price analysis
+
+We try to investigate the distribution of prices among the different alpine huts in dolomities; We collected manually the data from the SAT website where we found a detailed list of prices for each of the hut handled by them.
+
+```{r message=FALSE, warning=FALSE}
+#install.packages("rgdal")
+#install.packages("spdep")
+#install.packages("boot")
+
+library(rgdal)
+library(spdep)
+library(boot)
+library(ggplot2)
+```
+
+## Visualize the data
+
+
+```{r results='hide', echo=F,  message=F, warning=F}
+trentino <- readOGR("data/R/italy")[1, ]
+dolomiti_area <- readOGR("data/R/dolomiti")
+dolomiti_area_prices <- readOGR("data/R/geo_prices")
+```
+
+```{r}
+tab_10 <- c('#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf')
+
+plot(trentino, main="Trentino Dolomities Area")
+plot(dolomiti_area, add=TRUE, col=tab_10)
+
+```
+
+## Explore the huts prices and details.
+
+
+```{r}
+# preprocessing of prices data
+dolomiti_area_prices$elevation <- as.numeric(dolomiti_area_prices$elevation)
+dolomiti_area_prices$posto_ripo <- as.numeric(dolomiti_area_prices$posto_ripo)
+dolomiti_area_prices$posto_lett <- as.numeric(dolomiti_area_prices$posto_lett)
+dolomiti_area_prices$posto_le_1 <- as.numeric(dolomiti_area_prices$posto_le_1)
+dolomiti_area_prices$mezza_pens <- as.numeric(dolomiti_area_prices$mezza_pens)
+dolomiti_area_prices$mezza_pe_1 <- as.numeric(dolomiti_area_prices$mezza_pe_1)
+dolomiti_area_prices$capacity <- as.numeric(dolomiti_area_prices$capacity)
+dolomiti_area_prices$categoria <- as.factor(dolomiti_area_prices$categoria)
+
+#summary information
+summary(dolomiti_area_prices[, c('elevation', 'posto_ripo', 'posto_lett', 'posto_le_1', 'mezza_pens', 'mezza_pe_1', 'capacity')])
+
+```
+
+Explore statistical properties of alpine huts prices
+
+
+```{r message=FALSE, warning=FALSE}}
+library("ggpubr")
+
+# 1. Create a box plot (bp)
+ele_box <- ggplot(
+  data=dolomiti_area_prices@data, 
+  aes(y = dolomiti_area_prices@data[, "elevation"])) +
+  geom_boxplot(
+    color=tab_10[1], fill=tab_10[1], alpha=0.2,
+    aes(y = dolomiti_area_prices@data[, "elevation"],)
+    )+
+  labs(y='Elevation')
+
+cap_box <- ggplot(
+  data=dolomiti_area_prices@data, 
+  aes(y = dolomiti_area_prices@data[, "capacity"])) +
+  geom_boxplot(
+    color=tab_10[2], fill=tab_10[2], alpha=0.2,
+    aes(y = dolomiti_area_prices@data[, "capacity"])
+    )+
+  labs(y='Capacity')
+
+
+let_soci_box <- ggplot(
+  data=dolomiti_area_prices@data, 
+  aes(y = dolomiti_area_prices@data[, "posto_lett"])) +
+  geom_boxplot(
+    color=tab_10[3], fill=tab_10[3], alpha=0.2,
+    aes(y = dolomiti_area_prices@data[, "posto_lett"])
+    )+
+  labs(y='Posto letto soci')
+
+let_non_soci_box <- ggplot(
+  data=dolomiti_area_prices@data, 
+  aes(y = dolomiti_area_prices@data[, "posto_le_1"])) +
+  geom_boxplot(
+    color=tab_10[5], fill=tab_10[5], alpha=0.2,
+    aes(y = dolomiti_area_prices@data[, "posto_le_1"])
+    )+
+  labs(y='Posto letto non soci')
+
+pens_soci_box <- ggplot(
+  data=dolomiti_area_prices@data, 
+  aes(y = dolomiti_area_prices@data[, "mezza_pens"])) +
+  geom_boxplot(
+    color=tab_10[6], fill=tab_10[6], alpha=0.2,
+    aes(y = dolomiti_area_prices@data[, "mezza_pens"])
+    )+
+  labs(y='Mezza pensione soci')
+
+pens_non_soci_box <- ggplot(
+  data=dolomiti_area_prices@data, 
+  aes(y = dolomiti_area_prices@data[, "mezza_pe_1"])) +
+  geom_boxplot(
+    color=tab_10[7], fill=tab_10[7], alpha=0.2,
+    aes(y = dolomiti_area_prices@data[, "mezza_pe_1"])
+    )+
+  labs(y='Mezza pensione non soci')
+
+par(mar=(c(0,0,0,0)))
+figure <- ggarrange(
+  ele_box, cap_box, 
+  let_soci_box, let_non_soci_box,
+  pens_soci_box, pens_non_soci_box,
+  labels = c(
+    "Elevation", "Capacity", 
+    "Posto Letto Soci", "Posto Letto Non Soci",
+    "Pensione Soci", "Pensione Non Soci"),
+  ncol = 2, nrow = 3
+)
+
+figure
+```
+
+
+```{r}
+# sat huts
+plot(trentino, main="Trentino Dolomities Area Huts")
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(dolomiti_area_prices, add=TRUE, col='blue', cex=.8, pch=10)
+```
+## Neighbours
+### k-Nearest neighbours
+
+Definition:
+The k-nearest neighbours criterion implies that two spatial units are considered as neighbours if their distance is equal, or less than equal, to the minimum possible distance that can be found amongst all the observations.This definition of neighbourhood ensures that each spatial unit has exactly the same number k of neighbours.
+
+
+```{r}
+
+knn_1 <- knn2nb(
+    knearneigh(dolomiti_area_prices, k=1)
+  )
+
+plot(trentino, border="grey", main='huts with k neighbor = 1')
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(knn_1, dolomiti_area_prices, add=TRUE)
+
+```
+
+```{r}
+knn_2 <- knn2nb(
+    knearneigh(dolomiti_area_prices, k=2)
+  )
+
+plot(trentino, border="grey", main='huts with k neighbor = 2')
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(knn_2, dolomiti_area_prices, add=TRUE)
+
+
+```
+
+```{r}
+knn_5 <- knn2nb(
+    knearneigh(dolomiti_area_prices, k=5)
+  )
+
+plot(trentino, border="grey", main='huts with k neighbor = 5')
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(knn_5, dolomiti_area_prices, add=TRUE)
+
+```
+
+### Critical cut-off neighbourhood 
+
+Definition:
+Critical cut-off neighbourhood criterion implies that two spatial units are considered as neighbours if their distance is equal, or less than equal, to a certain fixed distance which represents a critical cut-off. This threshold distance should not be smaller than the minimum value that ensures that each spatial unit has at least one neighbour.
+
+```{r message=FALSE, warning=FALSE}
+cut_off_min <- max(
+    unlist(nbdists(knn_1, dolomiti_area_prices, longlat = T))
+  ) 
+
+
+# different cut of experiments
+cut_off_minimum = dnearneigh(dolomiti_area_prices, 0, cut_off_min, longlat=T)
+print('Summary neighbour stats:')
+cut_off_minimum
+```
+
+```{r}
+plot(trentino, main= paste('neighbour minimum cut off', round(cut_off_min,2)))
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(cut_off_minimum, 
+     dolomiti_area_prices, 
+     add = TRUE, 
+     col = "red")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+cut_off_20 = dnearneigh(dolomiti_area_prices, 0, cut_off_min + (cut_off_min * .2), longlat=T)
+# different cut of experiments
+print('Summary neighbour stats:')
+cut_off_20
+```
+
+
+```{r}
+plot(trentino, main= paste('neighbour minimum cut off', round(cut_off_min + (cut_off_min * .2),2)))
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(cut_off_20, 
+     dolomiti_area_prices, 
+     add = TRUE, 
+     col = "red")
+```
+
+```{r}
+cut_off_50 = dnearneigh(dolomiti_area_prices, 0, cut_off_min + (cut_off_min * .5), longlat=T)
+
+# different cut of experiments
+print('Summary neighbour stats:')
+cut_off_50
+```
+
+```{r}
+plot(trentino, main= paste('neighbour minimum cut off', round(cut_off_min + (cut_off_min * .5),2)))
+plot(dolomiti_area, add=TRUE, col=tab_10)
+plot(cut_off_50, 
+     dolomiti_area_prices, 
+     add = TRUE, 
+     col = "red")
+```
+
+## Defining matrices of spatial weights
+
+Let us define $N(i)$ as the set of all neighbours (however defined) of spatial unit $i$. The form of a binary spatial weight matrix
+$W$ of generic element $w_{ij}$ 
+
+$$
+\begin{equation}
+  w_{ij}=\begin{cases}
+    1, & \text{if $j \in N(i)$}.\\
+    0, & \text{otherwise}.
+  \end{cases}
+\end
+$$
+
+It is often useful to spatial weight matrices that are row-standardized, in the sense that each row sums up to 1.
+
+Once the neighbourhood relationships between observations have been defined, the spatial weights matrix can be created. In our case we will calculate a standardised spatial weight matrix for each list of critical and k-nearest neighbours created earlier.
+
+```{r}
+#To create a row-standardized spatial weights matrix for each critical cut-off neighbours 
+
+knn_1.weight_matrix <- nb2listw(knn_1,style="W")
+knn_2.weight_matrix <- nb2listw(knn_2,style="W")
+knn_5.weight_matrix <- nb2listw(knn_5,style="W")
+cut_off_minimum.weight_matrix <- nb2listw(cut_off_minimum,style="W")
+cut_off_20.weight_matrix <- nb2listw(cut_off_20,style="W")
+cut_off_50.weight_matrix <- nb2listw(cut_off_50,style="W")
+```
+
+
+The most popular measure of (global) spatial autocorrelation of a variable is the Moran’s I index (Moran 1950), which is given by
+
+$$
+I =
+\frac{n} {\sum_{i=1}^{n} \sum_{j=1}^{n} w_{ij}}
+\frac
+{\sum_{i=1}^{n} \sum_{j=1}^{n} (x_{i} - \bar{x}) (x_{j} - \bar{x})} 
+{\sum_{i=1}^{n}(x_{i} - \bar{x}^{2})}
+
+$$
+
+and essentially account for the association between x and its spatial lag. Where the Spatia leg represents the average of the
+$x$ values for $i$’s neighbours.
+
+Its values range from (basically) -1 (negative association) and +1 (positive association). Values close to zero indicate absence of spatial autocorrelation.
+
+
+```{r}
+data_quantiles <- dolomiti_area_prices@data$mezza_pe_1
+quantile_breaks <- quantile(data_quantiles)
+
+plot(trentino, main='Quantile breaks of Mezza Pensione - Non soci')
+points(dolomiti_area_prices,  col = "black", pch = 20, cex=3)
+points(dolomiti_area_prices, col=tab_10[findInterval(data_quantiles, quantile_breaks, all.inside=TRUE)], pch = 20, cex=2.5)
+```
+```{r}
+data_quantiles <- dolomiti_area_prices@data$posto_le_1
+quantile_breaks <- quantile(data_quantiles, na.rm=T)
+
+plot(trentino, main='Quantile breaks of Posto Letto - Non soci')
+points(dolomiti_area_prices,  col = "black", pch = 20, cex=3)
+points(dolomiti_area_prices, col=tab_10[findInterval(data_quantiles, quantile_breaks, all.inside=TRUE)], pch = 20, cex=2.5)
+```
+
+Between the two it seems more intersting to analyze the price of the "Mezza Pensione - Non Soci" which includes foods.
+
+
+```{r}
+# we try to combine the cost with an indicator of the pensione and posto letto non soci.
+var_to_analyze <- dolomiti_area_prices$mezza_pe_1
+var_to_analyze <- dolomiti_area_prices$mezza_pe_1 + dolomiti_area_prices$posto_le_1
+
+spaces <-  print(paste(replicate(50, "-"), collapse = ""))
+
+#perform the global Morans I test 
+moran.test(var_to_analyze, knn_1.weight_matrix, randomisation=FALSE); spaces
+moran.test(var_to_analyze, knn_2.weight_matrix, randomisation=FALSE); spaces
+moran.test(var_to_analyze, knn_5.weight_matrix, randomisation=FALSE); spaces
+moran.test(var_to_analyze, cut_off_minimum.weight_matrix, randomisation=FALSE); spaces
+moran.test(var_to_analyze, cut_off_20.weight_matrix, randomisation=FALSE) ; spaces
+moran.test(var_to_analyze, cut_off_50.weight_matrix, randomisation=FALSE) ; spaces
+```
+
+```{r}
+# under the assumption of randomisation
+print('Under Randomisation Assumptions')
+moran.test(var_to_analyze, knn_1.weight_matrix, randomisation=TRUE); spaces
+moran.test(var_to_analyze, knn_2.weight_matrix, randomisation=TRUE); spaces
+moran.test(var_to_analyze, knn_5.weight_matrix, randomisation=TRUE); spaces
+moran.test(var_to_analyze, cut_off_minimum.weight_matrix, randomisation=TRUE); spaces
+moran.test(var_to_analyze, cut_off_20.weight_matrix, randomisation=TRUE); spaces
+moran.test(var_to_analyze, cut_off_50.weight_matrix, randomisation=TRUE); spaces
+```
+
+```{r}
+#perform the global Morans I test with MonteCarlo simulation
+moran.mc(var_to_analyze, knn_1.weight_matrix, nsim = 999); spaces
+moran.mc(var_to_analyze, knn_2.weight_matrix, nsim = 999); spaces
+moran.mc(var_to_analyze, knn_5.weight_matrix, nsim = 999); spaces
+
+moran.mc(var_to_analyze, cut_off_minimum.weight_matrix, nsim = 999); spaces
+moran.mc(var_to_analyze, cut_off_20.weight_matrix, nsim = 999); spaces
+moran.mc(var_to_analyze, cut_off_50.weight_matrix, nsim = 999); spaces
+```
+
+The values are coherent across the three approaches, it seems that there is a positive global spatial autocorrelation when we use a metric for computing the neighbours very small as $k=1$ or $k=2$ reaching a Moran I statistic = $.45$, $.37$.
+
+The analysis turned out to be positive, there is spatial correlation in the prices among alpine huts, there could be many reasons for that for instance, since it is very high for close neighbour, a possible explation could be related to the condition of the trail for providing resources and food to the huts or many others possibilities.
+
+## Prices vs Elevation
+Another possibility is not to involve any kind of spatial prospective but trying to understand if the prices are really related to the elevation or not. To do this we perform a simple linear regression, trying to understand trough the parameters the impact of the elevation into the prices.
+
+```{r message=FALSE, warning=FALSE}
+intersting_cols <- c("elevation",  "capacity", "posto_le_1")
+
+lm_elevation <- lm(posto_le_1 ~ ., dolomiti_area_prices[,intersting_cols])
+summary(lm_elevation) 
+```
+
+As expected also therelevation seems very important for predicting the prices of the alpine huts.
+
