@@ -35,12 +35,20 @@ def get_new_map(
 def add_map_infos(
     feature_layers: dict,
      _map: Map, 
-     collapsed_legend: bool = True
+     collapsed_legend: bool = True,
+     reverse_order: bool = False
   ) -> Map:
 
   # add layers to map
-  feature_layers['dolomiti_area'].add_to(_map)
+  if not reverse_order:
+    feature_layers['dolomiti_area'].add_to(_map)
+
   [feature.add_to(_map) for key, feature in feature_layers.items() if key != 'dolomiti_area']
+  
+  if reverse_order:
+    feature_layers['dolomiti_area'].add_to(_map)
+  
+
   # add tiles 
   TileLayer('Stamen Terrain').add_to(_map)
   TileLayer('Stamen Toner').add_to(_map)
