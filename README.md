@@ -13,7 +13,7 @@ all the notebooks already loaded with the interactive maps are visibile at the f
 
 This project has been developed in Google Colab; at the beginning of each notebook the specific requirements are installed, in order to run the code follow these steps:
 
-1. Open a new Colab notebook (https://colab.research.google.com/?hl=it)
-1. Mount the Google Drive (https://stackoverflow.com/questions/48376580/google-colab-how-to-read-data-from-my-google-drive)
+1. [Open a new Colab notebook](https://colab.research.google.com/?hl=it)
+1. [Mount the Google Drive](https://stackoverflow.com/questions/48376580/google-colab-how-to-read-data-from-my-google-drive)
 3. In the first cell run the command `!git clone https://github.com/GabrieleGhisleni/Geo-Dolomities.git`
 4. Open you Google Drive, enter in the folder Geo-Dolomities and just run the notebooks.
