@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Geo Dolomiti</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="utf-8">
+    <meta name="title" content="SSofy eserciziario">
+    <meta name="description" content="JavaScript exercises">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SSofy eserciziario">
+    <meta property="og:description" content="JavaScript exercises!">
+    <meta property="og:image" content="./assets/javascript.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+        integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.25.0/axios.min.js"
+        integrity="sha512-/Q6t3CASm04EliI1QyIDAA/nDo9R8FQ/BULoUFyN4n/BDdyIxeH7u++Z+eobdmr11gG5D/6nPFyDlnisDwhpYA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="./js/index.js"></script>
+    <link rel="icon" href="./assets/favicon.ico" />
+</head>
+<style>
+body{
+    background-color: rgb(123, 172, 49);
+}
+
+#title{
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 75px;
+}
+</style>
+<body>
+
+    <div id="nav-bar">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <a class="navbar-brand" href="#">Gabriele Ghisleni 220982</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fa fa-home fa-2x" aria-hidden="true"></i> </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 id="title">Geo-Dolomiti Exploration</h2>
+            </div>
+            <div class="col-12">
+
+                <div class="list-group">
+                    <a href="https://sofiiiaaa.github.io/Dashboard-Covid-ITA/"
+                        class="list-group-item list-group-item-item item" id="first-element">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">1_Dolomities_exploration.ipynb</h5>
+                        </div>
+                        <p class="mb-1">
+                            in the first section we will explore the entire area of the Dolomities, pointing out their
+                            location with respect to the Italian regions and municipalities, calculating some basics
+                            statistics; we will study their morphology visualizing and investigating the lakes and the
+                            glaciers that are present; last point of this first section concern a first exploration of
+                            the alpine huts retrieved from the official website of CAI and geo-coded through Nominatim
+                            service.
+                        </p>
+                    </a>
+
+
+                    <a href="./exercises/generate_quotations/index.html"
+                        class="list-group-item list-group-item-item item" id="second-element">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">2_huts_peaks_exploration.ipynb</h5>
+                        </div>
+                        <p class="mb-1">
+                            In the second section we will explore all the alpine huts, not only the ones from CAI
+                            website, and the peaks. We will retrieve the data from the OverPass API that allow to
+                            extract information from OpenStreetMap graph, focusing on the data geo-located in the
+                            North-east area of Italy. We will perform some analyses pointing out the major
+                            characteristics as the elevation, Dolomities group/province of belonging, the distance
+                            between the alpine huts and peaks greater than 3000m and highlighting the cost of the alpine
+                            huts (only for those from CAI).
+                        </p>
+                    </a>
+
+                    <a href="./exercises/guess the number/index.html" class="list-group-item list-group-item-item item"
+                        id="third-element">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">3_network_trails.ipynb</h5>
+                        </div>
+                        <p class="mb-1">
+                            In the third section we will focus on the trails, first starting from the SAT trails then
+                            using all the possible trails extracted with OpenStreetMap in the interested area. Doing
+                            this we will be able to generate real trails to reach each of the hut in the Dolomities.
+                            Moreover while doing this operation we will also add the elevation to each node in the graph
+                            allowing us to predict a travel time for complete the trails, this time is directly
+                            dependent of the difference in height of each piece of the trail. We will explore better the
+                            relation between peaks and huts exploring where it actually exists a path that bind them.
+                            Then we connect the trails and street graph calculating the optimal trail for each hut to
+                            the street taking in count, exploring the actual difference in height between the starting
+                            point-alpine huts and generating insightful details such as the expected walking time and
+                            level of difficulty of each trail.
+
+                        </p>
+                    </a>
+                    <a href="./exercises/play_with_numbers/index.html" class="list-group-item list-group-item-item item"
+                        id="fourth-element">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">4_hut_price_analyses.ipynb</h5>
+                        </div>
+                        <p class="mb-1">
+                            In the fourth section we have performed a simple spatial regression in order to understand
+                            if there is some kind of correlation in the prices of the hut's half board, we will also
+                            explore other possible explanatory variables such as the elevation of the hut and the
+                            capacity of the sleeping accommodations.
+                        </p>
+                    </a>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"
+        integrity="sha384-VHvPCCyXqtD5DqJeNxl2dtTyhF78xXNXdkwX1CZeRusQfRKp+tA7hAShOK/B/fQ2"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -1,7 +1,9 @@
 ---
 title: "Alpine huts price analysis"
 author: "Gabriele"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Alpine huts price analysis
@@ -22,7 +24,7 @@ library(ggplot2)
 ## Visualize the data
 
 
-```{r results='hide', echo=F,  message=F, warning=F}
+```{r results='hide', echo=F,  messages=F, warnings=F}
 trentino <- readOGR("data/R/italy")[1, ]
 dolomiti_area <- readOGR("data/R/dolomiti")
 dolomiti_area_prices <- readOGR("data/R/geo_prices")
@@ -58,7 +60,7 @@ summary(dolomiti_area_prices[, c('elevation', 'posto_ripo', 'posto_lett', 'posto
 Explore statistical properties of alpine huts prices
 
 
-```{r message=FALSE, warning=FALSE}}
+```{r message=FALSE, warning=FALSE}
 library("ggpubr")
 
 # 1. Create a box plot (bp)
