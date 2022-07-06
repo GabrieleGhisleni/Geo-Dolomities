@@ -8,7 +8,7 @@ We will perform a network analyses on all the trails that allow to visit those m
 
 Lastly we will perform a spatial analyses to understand if there is some correlation in the prices of the alpine huts according to the area in which they are.
 
-![Navigate the alpine huts in the Dolomities](docs/navigate.jpg)
+![Navigate the alpine huts in the Dolomities](images/navigate.jpg)
 
 all the notebooks already loaded with the interactive maps are visibile at the following [link](https://gabrieleghisleni.github.io/Geo-Dolomities/) :recycle:
 

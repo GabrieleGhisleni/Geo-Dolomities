@@ -28,10 +28,11 @@ const navbar = (path) => {
     document.write(`
 
     <nav class="navbar navbar-expand navbar-light sticky-top">
-    <a class="navbar-brand" href="${HOME_PAGE}">Gabriele Ghisleni 220982</a>
+    <a class="navbar-brand" href="${HOME_PAGE}">Gabriele Ghisleni</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
+    <a href="${LINKEDIN}"><i class="fa fa-linkedin-square fa-2x"></i></a>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
