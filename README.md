@@ -34,4 +34,6 @@ import os
 drive.mount('/content/drive')
 os.chdir('drive/MyDrive')
 !git clone https://github.com/GabrieleGhisleni/Geo-Dolomities.git
+
+#then go to your Google Drive and checkout the Geo-Dolomities folder!
 ```
