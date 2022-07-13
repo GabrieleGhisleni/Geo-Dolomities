@@ -42,3 +42,10 @@
     background-color: #1c7240;
     color: black;
     margin-bottom: 5px; }
+  .list-group #fifth-element {
+    text-align: center;
+    background-color: #ffb67a;
+    color: black;
+    margin-bottom: 5px; }
+    .list-group #fifth-element h5 {
+      text-align: center !important; }
